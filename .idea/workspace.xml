@@ -2,19 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c6e6fb69-b240-44b5-ac07-bda6ec8b4dac" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/config.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/config/config.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/dao/session_dao.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/dao/user_dao.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/dao/video_dao.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/dao/video_time_dao.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/models/data.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/models/feedback.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/models/hierarchy.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/models/session.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/models/user.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/models/video.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/models/video_time.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/go/route.go" beforeDir="false" afterPath="$PROJECT_DIR$/go/route.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
@@ -30,11 +17,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/go/route.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="277">
-              <caret line="138" lean-forward="true" selection-start-line="138" selection-end-line="138" />
-              <folding>
-                <element signature="e#13#135#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="374">
+              <caret line="89" column="10" lean-forward="true" selection-start-line="89" selection-start-column="10" selection-end-line="89" selection-end-column="10" />
             </state>
           </provider>
         </entry>
@@ -43,7 +27,19 @@
         <entry file="file://$PROJECT_DIR$/dao/video_time_dao.go">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="392">
-              <caret line="45" column="75" lean-forward="true" selection-start-line="45" selection-start-column="75" selection-end-line="45" selection-end-column="75" />
+              <caret line="45" column="75" selection-start-line="45" selection-start-column="75" selection-end-line="45" selection-end-column="75" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/main.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="153">
+              <caret line="9" column="31" lean-forward="true" selection-start-line="9" selection-start-column="31" selection-end-line="9" selection-end-column="31" />
+              <folding>
+                <element signature="e#14#60#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -76,8 +72,8 @@
         <option value="$PROJECT_DIR$/dao/user_dao.go" />
         <option value="$PROJECT_DIR$/dao/video_dao.go" />
         <option value="$PROJECT_DIR$/models/video_time.go" />
-        <option value="$PROJECT_DIR$/main.go" />
         <option value="$PROJECT_DIR$/dao/video_time_dao.go" />
+        <option value="$PROJECT_DIR$/main.go" />
         <option value="$PROJECT_DIR$/go/route.go" />
       </list>
     </option>
@@ -193,12 +189,12 @@
     <frame x="-8" y="-8" width="1936" height="1066" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.2553305" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.25799572" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49946696" visible="true" weight="0.3290461" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49946696" weight="0.3290461" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39978564" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -303,30 +299,27 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/dao/video_time_dao.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="392">
+          <caret line="45" column="75" selection-start-line="45" selection-start-column="75" selection-end-line="45" selection-end-column="75" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/main.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="272">
-          <caret line="16" lean-forward="true" selection-start-line="16" selection-end-line="16" />
+        <state relative-caret-position="153">
+          <caret line="9" column="31" lean-forward="true" selection-start-line="9" selection-start-column="31" selection-end-line="9" selection-end-column="31" />
           <folding>
             <element signature="e#14#60#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/dao/video_time_dao.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="392">
-          <caret line="45" column="75" lean-forward="true" selection-start-line="45" selection-start-column="75" selection-end-line="45" selection-end-column="75" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/go/route.go">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="277">
-          <caret line="138" lean-forward="true" selection-start-line="138" selection-end-line="138" />
-          <folding>
-            <element signature="e#13#135#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="374">
+          <caret line="89" column="10" lean-forward="true" selection-start-line="89" selection-start-column="10" selection-end-line="89" selection-end-column="10" />
         </state>
       </provider>
     </entry>
