@@ -46,8 +46,8 @@ func (m *VideoTimeDAO) Update(videoTime VideoTime) error {
 	err := m.db.C(m.Collection).UpdateId(videoTime.VideoTimeID, &videoTime)
 	return err
 }
-func (m *VideoTimeDAO) Delete(videoTime VideoTime) error{
-	err:=m.db.C(m.Collection).Remove(videoTime)
+func (m *VideoTimeDAO) Delete(id string) error{
+	err:=m.db.C(m.Collection).RemoveId(id)
 	return err
 }
 

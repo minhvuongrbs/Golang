@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"gopkg.in/mgo.v2/bson"
+	"log"
 	"net/http"
 	. "welcome_robot/config"
 	"welcome_robot/dao"
@@ -93,6 +94,12 @@ var routes = Routes{
 		"/wr/v1/videotime",
 		UpdateVideoTime,
 	},
+	Route{
+		"delete video time",
+		"DELETE",
+		"/wr/v1/videotime/{id}",
+		DeleteVideoTime,
+	},
 }
 
 func Index(w http.ResponseWriter, r *http.Request) {
@@ -128,7 +135,7 @@ func InsertVideo(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetVideoTime(w http.ResponseWriter, r *http.Request) {
-	params :=mux.Vars(r)
+	params := mux.Vars(r)
 	videoTime, err := videoTimeDAO.FindById(params["id"])
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid Movie ID")
@@ -137,15 +144,16 @@ func GetVideoTime(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusOK, videoTime)
 }
 
+
 func UpdateVideoTime(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "update Video time")
-	defer r.Body.Close()
+	defer r.Body.Close() //execute when updateVideoTime function finished (defer)
 	var videoTime VideoTime
 	if err := json.NewDecoder(r.Body).Decode(&videoTime); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
-	if err := videoTimeDAO.Update(videoTime); err != nil {
+	log.Print("videotimeid"+videoTime.VideoTimeID)
+	if  err := videoTimeDAO.Update(videoTime); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -161,6 +169,16 @@ func GetAllVideoTime(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusOK, videoTimes)
 }
 
+func DeleteVideoTime(w http.ResponseWriter, r *http.Request)  {
+	defer r.Body.Close()
+	params := mux.Vars(r)
+	if err := videoTimeDAO.Delete(params["id"]); err!=nil{
+		respondWithError(w,http.StatusInternalServerError, err.Error())
+		return
+	}
+	respondWithJson(w,http.StatusOK,map[string]string{"result":"success"})
+}
+
 func respondWithError(w http.ResponseWriter, code int, msg string) {
 	respondWithJson(w, code, map[string]string{"error": msg})
 }
@@ -168,5 +186,6 @@ func respondWithJson(w http.ResponseWriter, code int, payload interface{}) {
 	response, _ := json.Marshal(payload)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
-	w.Write(response)
+	_, _ = w.Write(response)
+	log.Print(code)
 }
