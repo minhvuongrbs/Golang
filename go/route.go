@@ -7,6 +7,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 	"log"
 	"net/http"
+	"time"
 	. "welcome_robot/config"
 	"welcome_robot/dao"
 	. "welcome_robot/models"
@@ -67,37 +68,47 @@ var routes = Routes{
 	Route{
 		"GetAllVideo",
 		"GET",
-		"/wr/v1/video",
+		"/wr/v1/videos",
 		GetAllVideo,
 	},
 	Route{
 		"Insert Video",
 		"POST",
-		"/wr/v1/video",
+		"/wr/v1/videos",
 		InsertVideo,
 	},
 	Route{
 		"Get Video Time",
 		"GET",
-		"/wr/v1/videotime/{id}",
+		"/wr/v1/videotimes/{id}",
 		GetVideoTime,
+	},Route{
+		"Delte Video",
+		"DELETE",
+		"/wr/v1/videos/{id}",
+		DeleteVideo,
 	},
 	Route{
+		"create video time",
+		"POST",
+		"/wr/v1/videotimes",
+		InsertVideoTime,
+	},Route{
 		"Get all video time",
 		"GET",
-		"/wr/v1/videotime",
+		"/wr/v1/videotimes",
 		GetAllVideoTime,
 	},
 	Route{
 		"update video time",
 		"PUT",
-		"/wr/v1/videotime",
+		"/wr/v1/videotimes",
 		UpdateVideoTime,
 	},
 	Route{
 		"delete video time",
 		"DELETE",
-		"/wr/v1/videotime/{id}",
+		"/wr/v1/videotimes/{id}",
 		DeleteVideoTime,
 	},
 }
@@ -105,20 +116,23 @@ var routes = Routes{
 func Index(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Home Page")
 }
-func GetAllSession(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "All Sesstion")
-}
 
-func GetAllVideo(w http.ResponseWriter, r *http.Request) {
-	videos, err := videoDAO.FindAll()
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
+func InsertSessions(w http.ResponseWriter, r *http.Request)  {
+	defer r.Body.Close()
+	var session Session
+	if err:=json.NewDecoder(r.Body).Decode(&session);err!=nil{
+		respondWithError(w,http.StatusBadRequest,"Invalid request payload")
 		return
 	}
-	respondWithJson(w, http.StatusOK, videos)
+	session.SessionID=bson.NewObjectId()
+
 }
+
+func GetAllSession(w http.ResponseWriter, r *http.Request) {
+
+}
+
 func InsertVideo(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Insert Video")
 	defer r.Body.Close()
 	var video Video
 	if err := json.NewDecoder(r.Body).Decode(&video); err != nil {
@@ -133,18 +147,49 @@ func InsertVideo(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusCreated, video)
 
 }
-
+func GetAllVideo(w http.ResponseWriter, r *http.Request) {
+	videos, err := videoDAO.FindAll()
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	respondWithJson(w, http.StatusOK, videos)
+}
+func DeleteVideo(w http.ResponseWriter, r *http.Request)  {
+	defer r.Body.Close()
+	params := mux.Vars(r)
+	if err:=videoDAO.Delete(params["id"]); err!=nil{
+		respondWithError(w,http.StatusInternalServerError,err.Error())
+		return
+	}
+	respondWithJson(w,http.StatusOK,map[string]string{"result":"success"})
+}
+func InsertVideoTime(w http.ResponseWriter, r *http.Request)  {
+	defer r.Body.Close()
+	var videoTime VideoTime
+	if err:=json.NewDecoder(r.Body).Decode(&videoTime);err!=nil{
+		respondWithError(w, http.StatusBadRequest,"Invalid request payload")
+		return
+	}
+	videoTime.VideoTimeID= bson.NewObjectId()
+	videoTime.IsPause=false
+	videoTime.TimeStamp=0
+	videoTime.TimeStart=time.Now()
+	if err:=videoTimeDAO.Insert(videoTime);err!=nil{
+		respondWithError(w,http.StatusInternalServerError,err.Error())
+		return
+	}
+	respondWithJson(w, http.StatusOK,videoTime)
+}
 func GetVideoTime(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	videoTime, err := videoTimeDAO.FindById(params["id"])
 	if err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid Movie ID")
+		respondWithError(w, http.StatusBadRequest, "Invalid video time ID")
 		return
 	}
 	respondWithJson(w, http.StatusOK, videoTime)
 }
-
-
 func UpdateVideoTime(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close() //execute when updateVideoTime function finished (defer)
 	var videoTime VideoTime
@@ -152,14 +197,12 @@ func UpdateVideoTime(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
-	log.Print("videotimeid"+videoTime.VideoTimeID)
 	if  err := videoTimeDAO.Update(videoTime); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
 }
-
 func GetAllVideoTime(w http.ResponseWriter, r *http.Request) {
 	videoTimes, err := videoTimeDAO.FindAll()
 	if err != nil {
@@ -168,7 +211,6 @@ func GetAllVideoTime(w http.ResponseWriter, r *http.Request) {
 	}
 	respondWithJson(w, http.StatusOK, videoTimes)
 }
-
 func DeleteVideoTime(w http.ResponseWriter, r *http.Request)  {
 	defer r.Body.Close()
 	params := mux.Vars(r)

@@ -30,7 +30,7 @@ func (m *VideoTimeDAO) Connect() {
 
 func (m *VideoTimeDAO) FindById(id string) (VideoTime, error) {
 	var videoTime VideoTime
-	err := m.db.C(videoTimeDAO.Collection).Find(bson.M{}).One(&videoTime)
+	err := m.db.C(videoTimeDAO.Collection).Find(bson.ObjectIdHex(id)).One(&videoTime)
 	return videoTime, err
 }
 func (m *VideoTimeDAO) FindAll() ([]VideoTime, error) {
@@ -43,11 +43,11 @@ func (m *VideoTimeDAO) Insert(videoTime VideoTime) error {
 	return err
 }
 func (m *VideoTimeDAO) Update(videoTime VideoTime) error {
-	err := m.db.C(m.Collection).UpdateId(videoTime.VideoTimeID, &videoTime)
+	err := m.db.C(videoTimeDAO.Collection).UpdateId(videoTime.VideoTimeID, &videoTime)
 	return err
 }
 func (m *VideoTimeDAO) Delete(id string) error{
-	err:=m.db.C(m.Collection).RemoveId(id)
+	err:=m.db.C(videoTimeDAO.Collection).RemoveId(bson.ObjectIdHex(id))
 	return err
 }
 

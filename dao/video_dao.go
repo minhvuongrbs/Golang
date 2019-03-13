@@ -37,3 +37,7 @@ func (m *VideoDAO) Insert(video Video) error {
 	err := m.db.C(videoDao.collection).Insert(&video)
 	return err
 }
+func (m *VideoDAO) Delete(id string) error{
+	err:=m.db.C(videoDao.collection).RemoveId(bson.ObjectIdHex(id))
+	return err
+}

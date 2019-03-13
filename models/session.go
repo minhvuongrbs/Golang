@@ -7,8 +7,8 @@ import (
 
 type Session struct {
 	SessionID bson.ObjectId `bson:"_id,omitempty"`
-	HostID User `bson:"host_id"`
-	UserID User `bson:"user_id"`
-	CheckInTime time.Time `bson:"check_in_time"`
-	VideoTimeID []VideoTime `bson:"video_time_id"`
+	HostID bson.ObjectId `bson:"supporter_id"`
+	UserID bson.ObjectId `bson:"user_id"`
+	IsOrdered bool `bson:"is_ordered"`
+	CheckInTime time.Time `bson:"check_in_time,omitempty"`
 }

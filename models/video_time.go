@@ -11,4 +11,6 @@ type VideoTime struct {
 	TimeStamp   int           `bson:"timestamp"`
 	TimeStart   time.Time     `bson:"start_time"`
 	IsPause     bool          `bson:"is_pause"`
+	SessionID   bson.ObjectId `bson:"_id"`
+
 }
