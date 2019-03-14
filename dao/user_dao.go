@@ -17,22 +17,39 @@ func GetAllUsers() ([]models.User, error) {
 	return users, err
 }
 
-func InsertUser(username string, password string, avatar string, discription string, language string) {
-	var firstName, lastName string
-	if language == "vi" {
-		firstName, lastName = HandleNameInVi(username)
+//func InsertUser(username string, password string, avatar string, discription string, language string) {
+//	var firstName, lastName string
+//	if language == "vi" {
+//		firstName, lastName = HandleNameInVi(username)
+//	} else {
+//		firstName, lastName = HandleNameInEng(username)
+//	}
+//	user := models.User{
+//		UserID:    bson.NewObjectId(),
+//		Username:  username,
+//		FirstName: firstName,
+//		LastName:  lastName,
+//		Password:  password,
+//	}
+//	_ = ConnectDatabase().DB(DatabaseName).C(UserCollection).Insert(user)
+//
+//}
+func InsertUser(userInfor models.UserInfo) (models.User, error) {
+	var user models.User
+	user.UserID = bson.NewObjectId()
+	if userInfor.Language== "vi" {
+		user.FirstName, user.LastName= HandleNameInVi(userInfor.Name)
 	} else {
-		firstName, lastName = HandleNameInEng(username)
+		user.FirstName, user.LastName= HandleNameInEng(userInfor.Name)
 	}
-	user := models.User{
-		UserID:    bson.NewObjectId(),
-		Username:  username,
-		FirstName: firstName,
-		LastName:  lastName,
-		Password:  password,
-	}
-	_ = ConnectDatabase().DB(DatabaseName).C(UserCollection).Insert(user)
-
+	user.Username =userInfor.Name
+	user.Password = userInfor.Password
+	user.Data.Avatar= userInfor.Avatar
+	user.Data.Description =userInfor.Description
+	user.Data.HierarchyName = userInfor.HierarchyName
+	user.Permission= userInfor.Permission
+	err :=ConnectDatabase().DB(DatabaseName).C(UserCollection).Insert(&user)
+	return user,err
 }
 
 func HandleNameInVi(fullName string) (string, string) {

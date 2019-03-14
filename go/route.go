@@ -60,10 +60,21 @@ var routes = Routes{
 		Index,
 	},
 	Route{
+		"Create User",
+		"POST",
+		"/wr/v1/users",
+		InsertUser,
+	},
+	Route{
 		"GetAllSession",
 		"GET",
 		"/wr/v1/sessions",
 		GetAllSession,
+	}, Route{
+		"InsertSession",
+		"POST",
+		"/wr/v1/sessions",
+		InsertSessions,
 	},
 	Route{
 		"GetAllVideo",
@@ -82,7 +93,7 @@ var routes = Routes{
 		"GET",
 		"/wr/v1/videotimes/{id}",
 		GetVideoTime,
-	},Route{
+	}, Route{
 		"Delte Video",
 		"DELETE",
 		"/wr/v1/videos/{id}",
@@ -93,7 +104,7 @@ var routes = Routes{
 		"POST",
 		"/wr/v1/videotimes",
 		InsertVideoTime,
-	},Route{
+	}, Route{
 		"Get all video time",
 		"GET",
 		"/wr/v1/videotimes",
@@ -117,15 +128,53 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Home Page")
 }
 
-func InsertSessions(w http.ResponseWriter, r *http.Request)  {
+func InsertUser(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	var session Session
-	if err:=json.NewDecoder(r.Body).Decode(&session);err!=nil{
-		respondWithError(w,http.StatusBadRequest,"Invalid request payload")
+	var user User
+	var userInfor UserInfo
+	if err := json.NewDecoder(r.Body).Decode(&userInfor); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
-	session.SessionID=bson.NewObjectId()
+	user, err := dao.InsertUser(userInfor)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	respondWithJson(w, http.StatusCreated, user)
+}
 
+func InsertSessions(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	var session Session
+	var user User
+	var userInfor UserInfo
+	if err := json.NewDecoder(r.Body).Decode(&userInfor); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
+		return
+	}
+	session.SessionID = bson.NewObjectId()
+	if userInfor.Permission == 2 {
+		session.CheckInTime = time.Now()
+		user2, err := dao.InsertUser(userInfor)
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		user=user2
+		respondWithJson(w, http.StatusCreated, user2)
+	}
+	session.SupporterID = getSupporterId()
+	session.UserID = user.UserID
+	if err := dao.InsertSession(session); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	respondWithJson(w, http.StatusCreated, session)
+}
+
+func getSupporterId() bson.ObjectId {
+	return bson.ObjectIdHex("5c8a1dcf31ce971134ca0722")
 }
 
 func GetAllSession(w http.ResponseWriter, r *http.Request) {
@@ -155,31 +204,31 @@ func GetAllVideo(w http.ResponseWriter, r *http.Request) {
 	}
 	respondWithJson(w, http.StatusOK, videos)
 }
-func DeleteVideo(w http.ResponseWriter, r *http.Request)  {
+func DeleteVideo(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	params := mux.Vars(r)
-	if err:=videoDAO.Delete(params["id"]); err!=nil{
-		respondWithError(w,http.StatusInternalServerError,err.Error())
+	if err := videoDAO.Delete(params["id"]); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	respondWithJson(w,http.StatusOK,map[string]string{"result":"success"})
+	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
 }
-func InsertVideoTime(w http.ResponseWriter, r *http.Request)  {
+func InsertVideoTime(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	var videoTime VideoTime
-	if err:=json.NewDecoder(r.Body).Decode(&videoTime);err!=nil{
-		respondWithError(w, http.StatusBadRequest,"Invalid request payload")
+	if err := json.NewDecoder(r.Body).Decode(&videoTime); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
-	videoTime.VideoTimeID= bson.NewObjectId()
-	videoTime.IsPause=false
-	videoTime.TimeStamp=0
-	videoTime.TimeStart=time.Now()
-	if err:=videoTimeDAO.Insert(videoTime);err!=nil{
-		respondWithError(w,http.StatusInternalServerError,err.Error())
+	videoTime.VideoTimeID = bson.NewObjectId()
+	videoTime.IsPause = false
+	videoTime.TimeStamp = 0
+	videoTime.TimeStart = time.Now()
+	if err := videoTimeDAO.Insert(videoTime); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	respondWithJson(w, http.StatusOK,videoTime)
+	respondWithJson(w, http.StatusOK, videoTime)
 }
 func GetVideoTime(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
@@ -197,7 +246,7 @@ func UpdateVideoTime(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
-	if  err := videoTimeDAO.Update(videoTime); err != nil {
+	if err := videoTimeDAO.Update(videoTime); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -211,14 +260,14 @@ func GetAllVideoTime(w http.ResponseWriter, r *http.Request) {
 	}
 	respondWithJson(w, http.StatusOK, videoTimes)
 }
-func DeleteVideoTime(w http.ResponseWriter, r *http.Request)  {
+func DeleteVideoTime(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	params := mux.Vars(r)
-	if err := videoTimeDAO.Delete(params["id"]); err!=nil{
-		respondWithError(w,http.StatusInternalServerError, err.Error())
+	if err := videoTimeDAO.Delete(params["id"]); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	respondWithJson(w,http.StatusOK,map[string]string{"result":"success"})
+	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
 func respondWithError(w http.ResponseWriter, code int, msg string) {

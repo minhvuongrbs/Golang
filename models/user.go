@@ -9,4 +9,5 @@ type User struct {
 	LastName  string        `bson:"last_name"`
 	Password  string        `bson:"password"`
 	Data      Data          `bson:"data"`
+	Permission  int    `json:"permission"`
 }

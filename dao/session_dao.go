@@ -10,7 +10,7 @@ import (
 
 const (
 	DatabaseHost = "localhost:27017"
-	DatabaseName = "wr"
+	DatabaseName = "welcome_robot"
 	SessionCollection = "Session"
 )
 
@@ -24,6 +24,10 @@ func ConnectDatabase() *mgo.Session {
 	}
 	fmt.Println("MongoDB Connected")
 	return session
+}
+func InsertSession(session models.Session) error {
+	err:=ConnectDatabase().DB(DatabaseName).C(SessionCollection).Insert(&session)
+	return err
 }
 
 func GetAllSessions() ([]models.Session, error) {
