@@ -1,13 +1,13 @@
 package main
 
 import (
-"log"
-"net/http"
-"welcome_robot/go"
+	"log"
+	"net/http"
+	"welcome_robot/go"
 )
 
 func main() {
-	const PORT string = ":8000"
+	const PORT string = ":8080"
 	log.Printf("Server started at localhost" + PORT + "/wr/v1")
 	router := _go.NewRouter()
 

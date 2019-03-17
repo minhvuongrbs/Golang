@@ -10,11 +10,16 @@ const UserCollection = "User"
 
 func GetAllUsers() ([]models.User, error) {
 	var users []models.User
-	err := ConnectDatabase().DB(DatabaseName).C(UserCollection).Find(nil).All(&users)
+	err := ConnectDatabase().DB(DatabaseName).C(UserCollection).Find(nil).Select(bson.M{"permission":3}).All(&users)
 	if err != nil {
 		return users, err
 	}
 	return users, err
+}
+
+func  RemoveUser(id string) error{
+	err:=ConnectDatabase().DB(DatabaseName).C(UserCollection).RemoveId(bson.ObjectIdHex(id))
+	return err
 }
 
 //func InsertUser(username string, password string, avatar string, discription string, language string) {
