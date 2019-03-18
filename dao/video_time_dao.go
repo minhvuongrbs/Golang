@@ -30,7 +30,7 @@ func (m *VideoTimeDAO) Connect() {
 
 func (m *VideoTimeDAO) FindById(id string) (VideoTime, error) {
 	var videoTime VideoTime
-	err := m.db.C(videoTimeDAO.Collection).Find(bson.ObjectIdHex(id)).One(&videoTime)
+	err := m.db.C(videoTimeDAO.Collection).FindId(bson.ObjectIdHex(id)).One(&videoTime)
 	return videoTime, err
 }
 func (m *VideoTimeDAO) FindAll() ([]VideoTime, error) {
@@ -48,6 +48,10 @@ func (m *VideoTimeDAO) Update(videoTime VideoTime) error {
 }
 func (m *VideoTimeDAO) Delete(id string) error{
 	err:=m.db.C(videoTimeDAO.Collection).RemoveId(bson.ObjectIdHex(id))
+	return err
+}
+func (m *VideoTimeDAO) RemoveBySessionId(id string) error{
+	err:=m.db.C(videoTimeDAO.Collection).Remove(bson.M{"session_id":bson.ObjectIdHex(id)})
 	return err
 }
 

@@ -66,6 +66,12 @@ var routes = Routes{
 		InsertUser,
 	},
 	Route{
+		"Remove User",
+		"DELETE",
+		"/wr/v1/users/{id}",
+		RemoveUser,
+	},
+	Route{
 		"GetAllSession",
 		"GET",
 		"/wr/v1/sessions",
@@ -76,18 +82,18 @@ var routes = Routes{
 		"GET",
 		"/wr/v1/sessions/{id}",
 		GetSession,
-	},Route{
+	}, Route{
 		"InsertSession",
 		"POST",
 		"/wr/v1/sessions",
 		InsertSessions,
 	},
 	Route{
-	"RemoveSession",
-	"DELETE",
-	"/wr/v1/session/{id}",
-	RemoveSessions,
-},
+		"RemoveSession",
+		"DELETE",
+		"/wr/v1/sessions/{id}",
+		RemoveSessions,
+	},
 	Route{
 		"GetAllVideo",
 		"GET",
@@ -134,6 +140,17 @@ var routes = Routes{
 		"/wr/v1/videotimes/{id}",
 		DeleteVideoTime,
 	},
+	Route{
+		"Insert feedback",
+		"POST",
+		"/wr/v1/feedbacks",
+		InsertFeedback,
+	},Route{
+		"Get All Feedback",
+		"GET",
+		"/wr/v1/feedbacks",
+		GetAllFeedback,
+	},
 }
 
 func Index(w http.ResponseWriter, r *http.Request) {
@@ -156,6 +173,16 @@ func InsertUser(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusCreated, user)
 }
 
+func RemoveUser(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	params := mux.Vars(r)
+	if err := dao.RemoveUser(params["id"]); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
+}
+
 func InsertSessions(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	var session Session
@@ -168,12 +195,6 @@ func InsertSessions(w http.ResponseWriter, r *http.Request) {
 	session.SessionID = bson.NewObjectId()
 	if userInfor.Permission != 2 {
 		session.CheckInTime = time.Now()
-		user2, err := dao.InsertUser(userInfor)
-		if err != nil {
-			respondWithError(w, http.StatusInternalServerError, err.Error())
-			return
-		}
-		user=user2
 		//respondWithJson(w, http.StatusCreated, user2)
 	}
 	user, err := dao.InsertUser(userInfor)
@@ -181,7 +202,7 @@ func InsertSessions(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	respondWithJson(w, http.StatusCreated, user)
+	//respondWithJson(w, http.StatusCreated, user)
 	session.SupporterID = getSupporterId()
 	session.UserID = user.UserID
 	if err := dao.InsertSession(session); err != nil {
@@ -196,7 +217,7 @@ func getSupporterId() bson.ObjectId {
 }
 
 func GetAllSession(w http.ResponseWriter, r *http.Request) {
-	users,err := dao.GetAllUsers()
+	users, err := dao.GetAllUsers()
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -204,7 +225,7 @@ func GetAllSession(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusOK, users)
 }
 
-func GetSession(w http.ResponseWriter, r *http.Request)  {
+func GetSession(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	session, err := dao.GetSessionByUserID(params["id"])
 	if err != nil {
@@ -223,29 +244,25 @@ func GetSession(w http.ResponseWriter, r *http.Request)  {
 //	respondWithJson(w, http.StatusOK, sessions)
 //}
 
-func RemoveSessions(w http.ResponseWriter, r *http.Request)  {
+func RemoveSessions(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	params := mux.Vars(r)
 	var session Session
-	var user User
+	session, err := dao.GetSessionById(params["id"])
+	if  err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	if err := dao.RemoveUser(session.UserID.Hex()); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
 	if err := dao.RemoveSession(params["id"]); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-		if session2,err:=dao.GetSessionById(params["id"]);err != nil{
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-		session =session2
-	}
-	user.UserID =session.UserID
-	if err := dao.RemoveUser(user.UserID.String()); err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-	if err := videoTimeDAO.Delete(params["id"]); err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
+
+	_ = videoTimeDAO.RemoveBySessionId(session.SessionID.Hex())
 	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
@@ -336,6 +353,29 @@ func DeleteVideoTime(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
+}
+
+func InsertFeedback(w http.ResponseWriter, r *http.Request)  {
+	defer r.Body.Close()
+	var fb = Feedback{}
+	err := json.NewDecoder(r.Body).Decode(&fb)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	_, err = dao.InsertFeedback(fb)
+	if err != nil {
+		_, _ = fmt.Fprint(w, "Create fail")
+	}
+	_, _ = fmt.Fprintf(w, "Create successfully")
+}
+
+func GetAllFeedback(w http.ResponseWriter, r *http.Request)  {
+	fbs, err := dao.GetAllFeedback()
+	if err != nil {
+		_, _ = fmt.Fprintf(w, err.Error())
+	} else {
+		_ = json.NewEncoder(w).Encode(fbs)
+	}
 }
 
 func respondWithError(w http.ResponseWriter, code int, msg string) {

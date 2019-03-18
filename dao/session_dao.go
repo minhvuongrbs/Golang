@@ -36,7 +36,7 @@ func RemoveSession(id string) error  {
 
 func GetSessionById(id string) (models.Session, error) {
 	var session models.Session
-	err := ConnectDatabase().DB(DatabaseName).C(SessionCollection).Find(bson.ObjectIdHex(id)).One(&session)
+	err := ConnectDatabase().DB(DatabaseName).C(SessionCollection).FindId(bson.ObjectIdHex(id)).One(&session)
 	return session, err
 }
 
@@ -76,6 +76,6 @@ func GetAllSession() ([]models.Session, error) {
 
 func GetSessionByUserID(userID string) (models.Session, error) {
 	var session models.Session
-	err := ConnectDatabase().DB(DatabaseName).C(SessionCollection).Find(nil).Select(bson.M{"user_id":userID}).One(session)
+	err := ConnectDatabase().DB(DatabaseName).C(SessionCollection).Find(bson.M{"user_id":bson.ObjectIdHex(userID)}).One(&session)
 	return session, err
 }
