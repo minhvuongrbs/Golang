@@ -10,7 +10,7 @@ const UserCollection = "User"
 
 func GetAllUsers() ([]models.User, error) {
 	var users []models.User
-	err := ConnectDatabase().DB(DatabaseName).C(UserCollection).Find(nil).Select(bson.M{"permission":3}).All(&users)
+	err := ConnectDatabase().DB(DatabaseName).C(UserCollection).Find(bson.M{"permission":3}).All(&users)
 	if err != nil {
 		return users, err
 	}

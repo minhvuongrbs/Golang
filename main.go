@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	const PORT string = ":8080"
+	const PORT string = ":8000"
 	log.Printf("Server started at localhost" + PORT + "/wr/v1")
 	router := _go.NewRouter()
 
