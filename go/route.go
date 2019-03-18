@@ -166,7 +166,7 @@ func InsertSessions(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	session.SessionID = bson.NewObjectId()
-	if userInfor.Permission == 2 {
+	if userInfor.Permission != 2 {
 		session.CheckInTime = time.Now()
 		user2, err := dao.InsertUser(userInfor)
 		if err != nil {
@@ -176,6 +176,12 @@ func InsertSessions(w http.ResponseWriter, r *http.Request) {
 		user=user2
 		//respondWithJson(w, http.StatusCreated, user2)
 	}
+	user, err := dao.InsertUser(userInfor)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	respondWithJson(w, http.StatusCreated, user)
 	session.SupporterID = getSupporterId()
 	session.UserID = user.UserID
 	if err := dao.InsertSession(session); err != nil {
