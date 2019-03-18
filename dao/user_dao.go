@@ -10,16 +10,22 @@ const UserCollection = "User"
 
 func GetAllUsers() ([]models.User, error) {
 	var users []models.User
-	err := ConnectDatabase().DB(DatabaseName).C(UserCollection).Find(bson.M{"permission":3}).All(&users)
+	err := ConnectDatabase().DB(DatabaseName).C(UserCollection).Find(bson.M{"permission": 3}).All(&users)
 	if err != nil {
 		return users, err
 	}
 	return users, err
 }
 
-func  RemoveUser(id string) error{
-	err:=ConnectDatabase().DB(DatabaseName).C(UserCollection).RemoveId(bson.ObjectIdHex(id))
+func RemoveUser(id string) error {
+	err := ConnectDatabase().DB(DatabaseName).C(UserCollection).RemoveId(bson.ObjectIdHex(id))
 	return err
+}
+
+func FindUserById(id string) (models.User, error) {
+	var user models.User
+	err := ConnectDatabase().DB(DatabaseName).C(UserCollection).FindId(bson.ObjectIdHex(id)).One(&user)
+	return user, err
 }
 
 //func InsertUser(username string, password string, avatar string, discription string, language string) {
@@ -42,19 +48,19 @@ func  RemoveUser(id string) error{
 func InsertUser(userInfor models.UserInfo) (models.User, error) {
 	var user models.User
 	user.UserID = bson.NewObjectId()
-	if userInfor.Language== "vi" {
-		user.FirstName, user.LastName= HandleNameInVi(userInfor.Name)
+	if userInfor.Language == "vi" {
+		user.FirstName, user.LastName = HandleNameInVi(userInfor.Name)
 	} else {
-		user.FirstName, user.LastName= HandleNameInEng(userInfor.Name)
+		user.FirstName, user.LastName = HandleNameInEng(userInfor.Name)
 	}
-	user.Username =userInfor.Name
+	user.Username = userInfor.Name
 	user.Password = userInfor.Password
-	user.Data.Avatar= userInfor.Avatar
-	user.Data.Description =userInfor.Description
+	user.Data.Avatar = userInfor.Avatar
+	user.Data.Description = userInfor.Description
 	user.Data.HierarchyName = userInfor.HierarchyName
-	user.Permission= userInfor.Permission
-	err :=ConnectDatabase().DB(DatabaseName).C(UserCollection).Insert(&user)
-	return user,err
+	user.Permission = userInfor.Permission
+	err := ConnectDatabase().DB(DatabaseName).C(UserCollection).Insert(&user)
+	return user, err
 }
 
 func HandleNameInVi(fullName string) (string, string) {

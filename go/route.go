@@ -17,6 +17,13 @@ var config = Config{}
 var videoDAO = dao.VideoDAO{}
 var videoTimeDAO = dao.VideoTimeDAO{}
 
+type DetailSession struct {
+	SessionId   bson.ObjectId `bson:"session_id"`
+	Supporter   User          `bson:"supporter"`
+	User        User          `bson:"user"`
+	CheckInTime time.Time     `bson:"check_in_time"`
+}
+
 type Route struct {
 	Name        string
 	Method      string
@@ -66,6 +73,12 @@ var routes = Routes{
 		InsertUser,
 	},
 	Route{
+		"Get User",
+		"GET",
+		"/wr/v1/users/{id}",
+		GetUserById,
+	},
+	Route{
 		"Remove User",
 		"DELETE",
 		"/wr/v1/users/{id}",
@@ -81,7 +94,7 @@ var routes = Routes{
 		"GetSession",
 		"GET",
 		"/wr/v1/sessions/{id}",
-		GetSession,
+		GetDetailSession,
 	}, Route{
 		"InsertSession",
 		"POST",
@@ -145,7 +158,7 @@ var routes = Routes{
 		"POST",
 		"/wr/v1/feedbacks",
 		InsertFeedback,
-	},Route{
+	}, Route{
 		"Get All Feedback",
 		"GET",
 		"/wr/v1/feedbacks",
@@ -213,7 +226,7 @@ func InsertSessions(w http.ResponseWriter, r *http.Request) {
 }
 
 func getSupporterId() bson.ObjectId {
-	return bson.ObjectIdHex("5c8ded8d39b4c70754ea3889")
+	return bson.ObjectIdHex("5c8f626431ce9701e81c10a1")
 }
 
 func GetAllSession(w http.ResponseWriter, r *http.Request) {
@@ -225,6 +238,15 @@ func GetAllSession(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusOK, users)
 }
 
+func GetUserById(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	user, err := dao.FindUserById(params["id"])
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid User ID")
+		return
+	}
+	respondWithJson(w, http.StatusOK, user)
+}
 func GetSession(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	session, err := dao.GetSessionByUserID(params["id"])
@@ -235,37 +257,50 @@ func GetSession(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusOK, session)
 }
 
-//func GetAllSession(w http.ResponseWriter, r *http.Request) {
-//	sessions,err := dao.GetAllSession()
-//	if err != nil {
-//		respondWithError(w, http.StatusInternalServerError, err.Error())
-//		return
-//	}
-//	respondWithJson(w, http.StatusOK, sessions)
-//}
+func GetDetailSession(w http.ResponseWriter, r *http.Request) {
+	var supporter User
+	var user User
+	var session Session
+	var detailSession DetailSession
+	params := mux.Vars(r)
+	session, err := dao.GetSessionByUserID(params["id"])
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid User ID")
+		return
+	}
+	supporter, err = dao.FindUserById(session.SupporterID.Hex())
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, err.Error())
+	}
+	user, err = dao.FindUserById(session.UserID.Hex())
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, err.Error())
+	}
+	detailSession.SessionId = session.SessionID
+	detailSession.Supporter = supporter
+	detailSession.User = user
+	detailSession.CheckInTime = session.CheckInTime
+	log.Print(detailSession)
+	respondWithJson(w, http.StatusOK, detailSession)
+}
 
 func RemoveSessions(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	params := mux.Vars(r)
 	var session Session
 	session, err := dao.GetSessionById(params["id"])
-	if  err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, err.Error())
 		return
 	}
-	if err := dao.RemoveUser(session.UserID.Hex()); err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
+	_ = dao.RemoveUser(session.UserID.Hex())
+	_ = videoTimeDAO.RemoveBySessionId(session.SessionID.Hex())
 	if err := dao.RemoveSession(params["id"]); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-
-	_ = videoTimeDAO.RemoveBySessionId(session.SessionID.Hex())
 	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
 }
-
 func InsertVideo(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	var video Video
@@ -354,8 +389,7 @@ func DeleteVideoTime(w http.ResponseWriter, r *http.Request) {
 	}
 	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
 }
-
-func InsertFeedback(w http.ResponseWriter, r *http.Request)  {
+func InsertFeedback(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	var fb = Feedback{}
 	err := json.NewDecoder(r.Body).Decode(&fb)
@@ -363,13 +397,13 @@ func InsertFeedback(w http.ResponseWriter, r *http.Request)  {
 		fmt.Println(err.Error())
 	}
 	_, err = dao.InsertFeedback(fb)
+	log.Print(fb)
 	if err != nil {
 		_, _ = fmt.Fprint(w, "Create fail")
 	}
 	_, _ = fmt.Fprintf(w, "Create successfully")
 }
-
-func GetAllFeedback(w http.ResponseWriter, r *http.Request)  {
+func GetAllFeedback(w http.ResponseWriter, r *http.Request) {
 	fbs, err := dao.GetAllFeedback()
 	if err != nil {
 		_, _ = fmt.Fprintf(w, err.Error())
@@ -377,7 +411,6 @@ func GetAllFeedback(w http.ResponseWriter, r *http.Request)  {
 		_ = json.NewEncoder(w).Encode(fbs)
 	}
 }
-
 func respondWithError(w http.ResponseWriter, code int, msg string) {
 	respondWithJson(w, code, map[string]string{"error": msg})
 }

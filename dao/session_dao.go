@@ -29,8 +29,8 @@ func InsertSession(session models.Session) error {
 	err := ConnectDatabase().DB(DatabaseName).C(SessionCollection).Insert(&session)
 	return err
 }
-func RemoveSession(id string) error  {
-	err:= ConnectDatabase().DB(DatabaseName).C(SessionCollection).RemoveId(bson.ObjectIdHex(id))
+func RemoveSession(id string) error {
+	err := ConnectDatabase().DB(DatabaseName).C(SessionCollection).RemoveId(bson.ObjectIdHex(id))
 	return err
 }
 
@@ -47,10 +47,10 @@ func GetAllSession() ([]models.Session, error) {
 		//	"$match": bson.M{
 		//		"_id": bson.ObjectIdHex("56b9df0c1e930a99cb2c33e9")}},
 		bson.M{"$lookup": bson.M{
-			"from": "user",
-			"localField": "user_id",
+			"from":         "user",
+			"localField":   "user_id",
 			"foreignField": "_id",
-			"as": "user"}},
+			"as":           "user"}},
 	}
 	pipe := ConnectDatabase().DB(DatabaseName).C(SessionCollection).Pipe(query)
 	resp := []bson.M{}
@@ -64,18 +64,8 @@ func GetAllSession() ([]models.Session, error) {
 	return sessions, err
 }
 
-//func GetAllSessions() ([]models.Session, error) {
-//	collection := ConnectDatabase().DB(DatabaseName).C(SessionCollection)
-//	var sessions []models.Session
-//	err := collection.Find(nil).All(&sessions)
-//	if err != nil {
-//		return sessions, err
-//	}
-//	return sessions, err
-//}
-
 func GetSessionByUserID(userID string) (models.Session, error) {
 	var session models.Session
-	err := ConnectDatabase().DB(DatabaseName).C(SessionCollection).Find(bson.M{"user_id":bson.ObjectIdHex(userID)}).One(&session)
+	err := ConnectDatabase().DB(DatabaseName).C(SessionCollection).Find(bson.M{"user_id": bson.ObjectIdHex(userID)}).One(&session)
 	return session, err
 }
