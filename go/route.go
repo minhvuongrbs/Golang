@@ -169,7 +169,6 @@ var routes = Routes{
 func Index(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Home Page")
 }
-
 func InsertUser(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	var user User
@@ -185,7 +184,6 @@ func InsertUser(w http.ResponseWriter, r *http.Request) {
 	}
 	respondWithJson(w, http.StatusCreated, user)
 }
-
 func RemoveUser(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	params := mux.Vars(r)
@@ -195,7 +193,6 @@ func RemoveUser(w http.ResponseWriter, r *http.Request) {
 	}
 	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
 }
-
 func InsertSessions(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	var session Session
@@ -224,11 +221,9 @@ func InsertSessions(w http.ResponseWriter, r *http.Request) {
 	}
 	respondWithJson(w, http.StatusCreated, session)
 }
-
 func getSupporterId() bson.ObjectId {
 	return bson.ObjectIdHex("5c8f626431ce9701e81c10a1")
 }
-
 func GetAllSession(w http.ResponseWriter, r *http.Request) {
 	users, err := dao.GetAllUsers()
 	if err != nil {
@@ -237,7 +232,6 @@ func GetAllSession(w http.ResponseWriter, r *http.Request) {
 	}
 	respondWithJson(w, http.StatusOK, users)
 }
-
 func GetUserById(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	user, err := dao.FindUserById(params["id"])
@@ -247,16 +241,6 @@ func GetUserById(w http.ResponseWriter, r *http.Request) {
 	}
 	respondWithJson(w, http.StatusOK, user)
 }
-func GetSession(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	session, err := dao.GetSessionByUserID(params["id"])
-	if err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid User ID")
-		return
-	}
-	respondWithJson(w, http.StatusOK, session)
-}
-
 func GetDetailSession(w http.ResponseWriter, r *http.Request) {
 	var supporter User
 	var user User
@@ -283,7 +267,6 @@ func GetDetailSession(w http.ResponseWriter, r *http.Request) {
 	log.Print(detailSession)
 	respondWithJson(w, http.StatusOK, detailSession)
 }
-
 func RemoveSessions(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	params := mux.Vars(r)
