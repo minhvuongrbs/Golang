@@ -1,43 +1,22 @@
 package dao
 
 import (
-	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"log"
 	. "welcome_robot/models"
 )
 
-type VideoDAO struct {
-	Server string
-	Database string
-	db *mgo.Database
-	collection string
-}
+const videoDaoCollection = "Video"
 
-var videoDao VideoDAO
-
-func init() {
-	videoDao.collection= "Video"
-}
-
-func (m *VideoDAO) Connect() {
-	session, err :=mgo.Dial(m.Server)
-	if err!=nil{
-		log.Fatal(err)
-	}
-	m.db = session.DB(m.Database)
-}
-
-func (m *VideoDAO) FindAll() ([]Video, error) {
+func FindAllVideo() ([]Video, error) {
 	var videos []Video
-	err := m.db.C(videoDao.collection).Find(bson.M{}).All(&videos)
+	err := ConnectDatabase().C(videoDaoCollection).Find(bson.M{}).All(&videos)
 	return videos, err
 }
-func (m *VideoDAO) Insert(video Video) error {
-	err := m.db.C(videoDao.collection).Insert(&video)
+func InsertVideo(video Video) error {
+	err := ConnectDatabase().C(videoDaoCollection).Insert(&video)
 	return err
 }
-func (m *VideoDAO) Delete(id string) error{
-	err:=m.db.C(videoDao.collection).RemoveId(bson.ObjectIdHex(id))
+func DeleteVideo(id string) error {
+	err := ConnectDatabase().C(videoDaoCollection).RemoveId(bson.ObjectIdHex(id))
 	return err
 }

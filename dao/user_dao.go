@@ -10,41 +10,25 @@ const UserCollection = "User"
 
 func GetAllUsers() ([]models.User, error) {
 	var users []models.User
-	err := ConnectDatabase().DB(DatabaseName).C(UserCollection).Find(bson.M{"permission": 3}).All(&users)
+	err := ConnectDatabase().C(UserCollection).Find(bson.M{"permission": 3}).All(&users)
 	if err != nil {
 		return users, err
 	}
 	return users, err
 }
-
-func RemoveUser(id string) error {
-	err := ConnectDatabase().DB(DatabaseName).C(UserCollection).RemoveId(bson.ObjectIdHex(id))
-	return err
-}
-
 func FindUserById(id string) (models.User, error) {
+
+
 	var user models.User
-	err := ConnectDatabase().DB(DatabaseName).C(UserCollection).FindId(bson.ObjectIdHex(id)).One(&user)
+	err := ConnectDatabase().C(UserCollection).FindId(bson.ObjectIdHex(id)).One(&user)
 	return user, err
 }
 
-//func InsertUser(username string, password string, avatar string, discription string, language string) {
-//	var firstName, lastName string
-//	if language == "vi" {
-//		firstName, lastName = HandleNameInVi(username)
-//	} else {
-//		firstName, lastName = HandleNameInEng(username)
-//	}
-//	user := models.User{
-//		UserID:    bson.NewObjectId(),
-//		Username:  username,
-//		FirstName: firstName,
-//		LastName:  lastName,
-//		Password:  password,
-//	}
-//	_ = ConnectDatabase().DB(DatabaseName).C(UserCollection).Insert(user)
-//
-//}
+func RemoveUser(id string) error {
+	err := ConnectDatabase().C(UserCollection).RemoveId(bson.ObjectIdHex(id))
+	return err
+}
+
 func InsertUser(userInfor models.UserInfo) (models.User, error) {
 	var user models.User
 	user.UserID = bson.NewObjectId()
@@ -59,7 +43,7 @@ func InsertUser(userInfor models.UserInfo) (models.User, error) {
 	user.Data.Description = userInfor.Description
 	user.Data.HierarchyName = userInfor.HierarchyName
 	user.Permission = userInfor.Permission
-	err := ConnectDatabase().DB(DatabaseName).C(UserCollection).Insert(&user)
+	err := ConnectDatabase().C(UserCollection).Insert(&user)
 	return user, err
 }
 
