@@ -16,6 +16,17 @@ type Route struct {
 	HandlerFunc http.HandlerFunc
 }
 
+type Meta struct {
+	Status     string `json:"status"`
+	Message string `json:"message"`
+	ServerCode int    `json:"serverCode"`
+}
+
+type Response struct {
+	Meta Meta        `json:"meta"`
+	Data interface{} `json:"data"`
+}
+
 type Routes []Route
 
 func NewRouter() *mux.Router {
@@ -148,10 +159,24 @@ func Index(w http.ResponseWriter, r *http.Request) {
 }
 
 func respondWithError(w http.ResponseWriter, code int, msg string) {
-	respondWithJson(w, code, map[string]string{"error": msg})
+	var data Response
+	data.Meta.Status = "error"
+	data.Meta.ServerCode = code
+	data.Meta.Message =msg
+
+	response, _ := json.Marshal(data)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(code)
+	_, _ = w.Write(response)
+	log.Print(code)
 }
 func respondWithJson(w http.ResponseWriter, code int, payload interface{}) {
-	response, _ := json.Marshal(payload)
+	var data Response
+	data.Meta.Status = "success"
+	data.Meta.ServerCode = code
+	data.Data = payload
+
+	response, _ := json.Marshal(data)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	_, _ = w.Write(response)
