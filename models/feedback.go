@@ -6,8 +6,8 @@ import (
 )
 
 type Feedback struct {
-	FeedbackID bson.ObjectId `bson:"_id,omitempty"`
-	Comment    string        `bson:"comment"`
-	Rating     int           `bson:"rating"`
-	CreatedAT  time.Time     `bson:"created_at,omitempty"`
+	FeedbackID bson.ObjectId `json:"_id,omitempty"`
+	Comment    string        `json:"comment"`
+	Rating     int           `json:"rating"`
+	CreatedAT  time.Time     `json:"created_at,omitempty"`
 }

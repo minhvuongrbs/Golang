@@ -6,11 +6,10 @@ import (
 )
 
 type VideoTime struct {
-	VideoTimeID bson.ObjectId `bson:"_id,omitempty"`
-	VideoID     bson.ObjectId `bson:"video_id"`
-	TimeStamp   int           `bson:"timestamp"`
-	TimeStart   time.Time     `bson:"start_time"`
-	IsPause     bool          `bson:"is_pause"`
-	SessionID   bson.ObjectId `bson:"session_id"`
-
+	VideoTimeID bson.ObjectId `json:"_id,omitempty"`
+	VideoID     bson.ObjectId `json:"video_id"`
+	TimeStamp   int           `json:"timestamp"`
+	TimeStart   time.Time     `json:"start_time"`
+	IsPause     bool          `json:"is_pause"`
+	SessionID   bson.ObjectId `json:"session_id"`
 }

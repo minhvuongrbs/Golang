@@ -18,7 +18,7 @@ type Route struct {
 
 type Meta struct {
 	Status     string `json:"status"`
-	Message string `json:"message"`
+	Message    string `json:"message"`
 	ServerCode int    `json:"serverCode"`
 }
 
@@ -162,7 +162,7 @@ func respondWithError(w http.ResponseWriter, code int, msg string) {
 	var data Response
 	data.Meta.Status = "error"
 	data.Meta.ServerCode = code
-	data.Meta.Message =msg
+	data.Meta.Message = msg
 
 	response, _ := json.Marshal(data)
 	w.Header().Set("Content-Type", "application/json")

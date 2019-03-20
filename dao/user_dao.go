@@ -8,7 +8,7 @@ import (
 
 const UserCollection = "User"
 
-func GetAllUsers() ([]models.User, error) {
+func GetAllVisitors() ([]models.User, error) {
 	var users []models.User
 	err := ConnectDatabase().C(UserCollection).Find(bson.M{"permission": 3}).All(&users)
 	if err != nil {
@@ -17,8 +17,6 @@ func GetAllUsers() ([]models.User, error) {
 	return users, err
 }
 func FindUserById(id string) (models.User, error) {
-
-
 	var user models.User
 	err := ConnectDatabase().C(UserCollection).FindId(bson.ObjectIdHex(id)).One(&user)
 	return user, err

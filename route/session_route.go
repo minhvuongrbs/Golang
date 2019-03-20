@@ -2,6 +2,7 @@ package route
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gorilla/mux"
 	"gopkg.in/mgo.v2/bson"
 	"log"
@@ -49,13 +50,41 @@ func InsertSessions(w http.ResponseWriter, r *http.Request) {
 func getSupporterId() bson.ObjectId {
 	return bson.ObjectIdHex("5c8f626431ce9701e81c10a1")
 }
-func GetAllSession(w http.ResponseWriter, r *http.Request) {
-	users, err := dao.GetAllUsers()
+func GetAllVisitors(w http.ResponseWriter, r *http.Request) {
+	users, err := dao.GetAllVisitors()
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 	respondWithJson(w, http.StatusOK, users)
+}
+
+func GetAllSession(w http.ResponseWriter, r *http.Request) {
+	var sessions [] Session
+	var supporter User
+	var user User
+	sessions, err := dao.GetAllSession()
+	detailSessions := make([]DetailSession, len(sessions))
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	fmt.Print(len(sessions))
+	for i := 0; i < len(sessions); i++ {
+		supporter, err = dao.FindUserById(sessions[i].SupporterID.Hex())
+		if err != nil {
+			respondWithError(w, http.StatusBadRequest, err.Error())
+		}
+		user, err = dao.FindUserById(sessions[i].UserID.Hex())
+		if err != nil {
+			respondWithError(w, http.StatusBadRequest, err.Error())
+		}
+		detailSessions[i].SessionId = sessions[i].SessionID
+		detailSessions[i].Supporter = supporter
+		detailSessions[i].User = user
+		detailSessions[i].CheckInTime = sessions[i].CheckInTime
+	}
+	respondWithJson(w, http.StatusOK, detailSessions)
 }
 
 func GetDetailSession(w http.ResponseWriter, r *http.Request) {

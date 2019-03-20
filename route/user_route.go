@@ -2,12 +2,12 @@ package route
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/gorilla/mux"
 	"net/http"
 	"welcome_robot/dao"
 	. "welcome_robot/models"
 )
-
 
 func GetUserById(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
@@ -24,6 +24,11 @@ func InsertUser(w http.ResponseWriter, r *http.Request) {
 	var userInfor UserInfo
 	if err := json.NewDecoder(r.Body).Decode(&userInfor); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
+		return
+	}
+	if userInfor.Permission == 3 {
+		err := errors.New("mustn't checkin by this way")
+		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 	user, err := dao.InsertUser(userInfor)

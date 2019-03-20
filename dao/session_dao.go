@@ -45,3 +45,8 @@ func GetSessionByUserID(userID string) (models.Session, error) {
 		return session, err
 	}
 }
+func GetAllSession() ([]models.Session, error) {
+	var sessions []models.Session
+	err := ConnectDatabase().C(SessionCollection).Find(nil).All(&sessions)
+	return sessions, err
+}
