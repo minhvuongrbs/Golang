@@ -1,7 +1,9 @@
 package models
 
+import "gopkg.in/mgo.v2/bson"
+
 type UserInfo struct {
-	UserID        string    `bson:"_id,omitempty" json:"user_id"`
+	UserID        bson.ObjectId    `bson:"_id,omitempty" json:"user_id"`
 	Name          string    `bson:"name" json:"name"`
 	Avatar        string    `bson:"avatar,omitempty" json:"avatar"`
 	Description   [2]string `bson:"description" json:"description"`

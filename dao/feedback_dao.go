@@ -1,7 +1,6 @@
 package dao
 
 import (
-	"log"
 	"welcome_robot/models"
 
 	"gopkg.in/mgo.v2/bson"
@@ -16,10 +15,7 @@ func FindAllFeedback() ([]models.Feedback, error) {
 	return feedBacks, err
 }
 func InsertFeedback(feedback models.Feedback) (models.Feedback, error) {
-	err := ConnectDatabase().C(FeedbackCollection).Insert(feedback)
-	if err != nil {
-		log.Fatal("Insert Fail")
-	}
+	err := ConnectDatabase().C(FeedbackCollection).Insert(&feedback)
 	return feedback, err
 }
 

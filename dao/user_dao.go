@@ -29,7 +29,7 @@ func RemoveUser(id string) error {
 
 func InsertUser(userInfor models.UserInfo) (models.User, error) {
 	var user models.User
-	user.UserID = bson.NewObjectId()
+
 	if userInfor.Language == "vi" {
 		user.FirstName, user.LastName = HandleNameInVi(userInfor.Name)
 	} else {
@@ -41,8 +41,16 @@ func InsertUser(userInfor models.UserInfo) (models.User, error) {
 	user.Data.Description = userInfor.Description
 	user.Data.HierarchyName = userInfor.HierarchyName
 	user.Permission = userInfor.Permission
-	err := ConnectDatabase().C(UserCollection).Insert(&user)
-	return user, err
+	if userInfor.UserID.Hex() == "" {
+		user.UserID = bson.NewObjectId()
+		err := ConnectDatabase().C(UserCollection).Insert(&user)
+		return user, err
+	} else {
+		user.UserID = userInfor.UserID
+		err := ConnectDatabase().C(UserCollection).UpdateId(user.UserID, &user)
+		return user, err
+	}
+
 }
 
 func HandleNameInVi(fullName string) (string, string) {
