@@ -14,10 +14,10 @@ import (
 )
 
 type DetailSession struct {
-	SessionId   bson.ObjectId `bson:"session_id"`
-	Supporter   User          `bson:"supporter"`
-	User        User          `bson:"user"`
-	CheckInTime time.Time     `bson:"check_in_time"`
+	SessionId   bson.ObjectId `bson:"session_id" json:"session_id"`
+	Supporter   User          `bson:"supporter" json:"supporter"`
+	User        User          `bson:"user" json:"user"`
+	CheckInTime time.Time     `bson:"check_in_time" json:"check_in_time"`
 }
 
 func InsertSessions(w http.ResponseWriter, r *http.Request) {
