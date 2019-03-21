@@ -1,12 +1,12 @@
 package models
 
 type UserInfo struct {
-	UserID        string    `bson:"_id,omitempty"`
-	Name          string    `bson:"name"`
-	Avatar        string    `bson:"avatar,omitempty"`
-	Description   [2]string `bson:"description"`
-	Language      string    `bson:"language"`
-	HierarchyName string    `bson:"hierarchy_name"`
-	Password      string    `bson:"password,omitempty"`
-	Permission    int       `bson:"permission"`
+	UserID        string    `bson:"_id,omitempty" json:"user_id"`
+	Name          string    `bson:"name" json:"name"`
+	Avatar        string    `bson:"avatar,omitempty" json:"avatar"`
+	Description   [2]string `bson:"description" json:"description"`
+	Language      string    `bson:"language" json:"language"`
+	HierarchyName string    `bson:"hierarchy_name" json:"hierarchy_name"`
+	Password      string    `bson:"password,omitempty" json:"password"`
+	Permission    int       `bson:"permission" json:"permission"`
 }

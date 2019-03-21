@@ -19,7 +19,7 @@ type Route struct {
 type Meta struct {
 	Status     string `json:"status"`
 	Message    string `json:"message"`
-	ServerCode int    `json:"serverCode"`
+	ServerCode int `json:"server_code"`
 }
 
 type Response struct {

@@ -52,7 +52,7 @@ func getSupporterId() bson.ObjectId {
 	//var hierarchy := "human resource"
 	//var name := "tran dang"
 
-	return bson.ObjectIdHex("5c92f62d31ce972b50276acd")
+	return bson.ObjectIdHex("5c92f6c431ce972f1c27d169")
 }
 func GetAllVisitors(w http.ResponseWriter, r *http.Request) {
 	users, err := dao.GetAllVisitors()
