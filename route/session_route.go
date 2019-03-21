@@ -2,6 +2,7 @@ package route
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/gorilla/mux"
 	"gopkg.in/mgo.v2/bson"
@@ -48,7 +49,10 @@ func InsertSessions(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusCreated, session)
 }
 func getSupporterId() bson.ObjectId {
-	return bson.ObjectIdHex("5c8f626431ce9701e81c10a1")
+	//var hierarchy := "human resource"
+	//var name := "tran dang"
+
+	return bson.ObjectIdHex("5c92f62d31ce972b50276acd")
 }
 func GetAllVisitors(w http.ResponseWriter, r *http.Request) {
 	users, err := dao.GetAllVisitors()
@@ -73,11 +77,13 @@ func GetAllSession(w http.ResponseWriter, r *http.Request) {
 	for i := 0; i < len(sessions); i++ {
 		supporter, err = dao.FindUserById(sessions[i].SupporterID.Hex())
 		if err != nil {
-			respondWithError(w, http.StatusBadRequest, err.Error())
+			respondWithError(w, http.StatusInternalServerError, errors.New("server not found supporter id").Error())
+			return
 		}
 		user, err = dao.FindUserById(sessions[i].UserID.Hex())
 		if err != nil {
-			respondWithError(w, http.StatusBadRequest, err.Error())
+			respondWithError(w, http.StatusInternalServerError, errors.New("server not found user id").Error())
+			return
 		}
 		detailSessions[i].SessionId = sessions[i].SessionID
 		detailSessions[i].Supporter = supporter
