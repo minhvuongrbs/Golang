@@ -22,35 +22,40 @@ func FindUserById(id string) (models.User, error) {
 	return user, err
 }
 
+func FindUserByName(name string) (models.User, error) {
+	var user models.User
+	err := ConnectDatabase().C(UserCollection).Find(bson.M{"full_name": name}).One(&user)
+	return user, err
+}
+
 func RemoveUser(id string) error {
 	err := ConnectDatabase().C(UserCollection).RemoveId(bson.ObjectIdHex(id))
 	return err
 }
 
-func InsertUser(userInfor models.UserInfo) (models.User, error) {
+func InsertUser(userInfo models.UserInfo) (models.User, error) {
 	var user models.User
-
-	if userInfor.Language == "vi" {
-		user.FirstName, user.LastName = HandleNameInVi(userInfor.Name)
+	if userInfo.Language == "vi" {
+		user.FirstName, user.LastName = HandleNameInVi(userInfo.Name)
 	} else {
-		user.FirstName, user.LastName = HandleNameInEng(userInfor.Name)
+		user.FirstName, user.LastName = HandleNameInEng(userInfo.Name)
 	}
-	user.Username = userInfor.Name
-	user.Password = userInfor.Password
-	user.Data.Avatar = userInfor.Avatar
-	user.Data.Description = userInfor.Description
-	user.Data.HierarchyName = userInfor.HierarchyName
-	user.Permission = userInfor.Permission
-	if userInfor.UserID.Hex() == "" {
+	user.FullName = userInfo.Name
+	user.Username = userInfo.UserName
+	user.Password = userInfo.Password
+	user.Data.Avatar = userInfo.Avatar
+	user.Data.Description = userInfo.Description
+	user.Data.HierarchyName = userInfo.HierarchyName
+	user.Permission = userInfo.Permission
+	if userInfo.UserID.Hex() == "" {
 		user.UserID = bson.NewObjectId()
 		err := ConnectDatabase().C(UserCollection).Insert(&user)
 		return user, err
 	} else {
-		user.UserID = userInfor.UserID
+		user.UserID = userInfo.UserID
 		err := ConnectDatabase().C(UserCollection).UpdateId(user.UserID, &user)
 		return user, err
 	}
-
 }
 
 func HandleNameInVi(fullName string) (string, string) {

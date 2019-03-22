@@ -70,6 +70,12 @@ var routes = Routes{
 		RemoveUser,
 	},
 	Route{
+		"Check duplicate name",
+		"POST",
+		"/wr/v1/checkname",
+		CheckDuplicationName,
+	},
+	Route{
 		"GetAllSession",
 		"GET",
 		"/wr/v1/sessions",
