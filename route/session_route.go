@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"gopkg.in/mgo.v2/bson"
-	"log"
 	"net/http"
 	"time"
 	"welcome_robot/dao"
@@ -24,43 +23,47 @@ func InsertSessions(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	var session Session
 	var user User
-	var userInfor UserInfo
-	if err := json.NewDecoder(r.Body).Decode(&userInfor); err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
+	var userInfo UserInfo
+	if err := json.NewDecoder(r.Body).Decode(&userInfo); err != nil {
+		respondWithError(w, http.StatusBadRequest, err.Error())
 		return
 	}
-	session.SessionID = bson.NewObjectId()
-	if userInfor.Permission != 2 {
+	if userInfo.Permission != 2 {
 		session.CheckInTime = time.Now()
-		//respondWithJson(w, http.StatusCreated, user2)
 	}
-	user, err := dao.InsertUser(userInfor)
+	isInsert, user, err := dao.InsertUser(userInfo)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	//respondWithJson(w, http.StatusCreated, user)
 	session.SupporterID = getSupporterId()
 	session.UserID = user.UserID
-	if err := dao.InsertSession(session); err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
+	if isInsert {
+		session.SessionID = bson.NewObjectId()
+		if err := dao.InsertSession(session); err != nil {
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+	} else {
+		session2, err := dao.GetSessionByUserID(user.UserID.Hex())
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		session.SessionID = session2.SessionID
+		if err := dao.UpdateSession(session); err != nil {
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
 	}
-	respondWithJson(w, http.StatusCreated, session)
+
+	respondWithJson(w, http.StatusOK, session)
 }
 func getSupporterId() bson.ObjectId {
 	//var hierarchy := "human resource"
 	//var name := "tran dang"
 
-	return bson.ObjectIdHex("5c92f6c431ce972f1c27d169")
-}
-func GetAllVisitors(w http.ResponseWriter, r *http.Request) {
-	users, err := dao.GetAllVisitors()
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-	respondWithJson(w, http.StatusOK, users)
+	return bson.ObjectIdHex("5c94a33231ce970dd0a58e7f")
 }
 
 func GetAllSession(w http.ResponseWriter, r *http.Request) {
@@ -93,32 +96,6 @@ func GetAllSession(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusOK, detailSessions)
 }
 
-func GetDetailSession(w http.ResponseWriter, r *http.Request) {
-	var supporter User
-	var user User
-	var session Session
-	var detailSession DetailSession
-	params := mux.Vars(r)
-	session, err := dao.GetSessionByUserID(params["id"])
-	if err != nil {
-		respondWithError(w, http.StatusBadRequest, err.Error())
-		return
-	}
-	supporter, err = dao.FindUserById(session.SupporterID.Hex())
-	if err != nil {
-		respondWithError(w, http.StatusBadRequest, err.Error())
-	}
-	user, err = dao.FindUserById(session.UserID.Hex())
-	if err != nil {
-		respondWithError(w, http.StatusBadRequest, err.Error())
-	}
-	detailSession.SessionId = session.SessionID
-	detailSession.Supporter = supporter
-	detailSession.User = user
-	detailSession.CheckInTime = session.CheckInTime
-	log.Print(detailSession)
-	respondWithJson(w, http.StatusOK, detailSession)
-}
 func RemoveSessions(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	params := mux.Vars(r)
@@ -135,4 +112,9 @@ func RemoveSessions(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
+}
+
+func GetSessionByUserId(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	respondWithError(w, http.StatusBadRequest, errors.New("not found required").Error())
 }

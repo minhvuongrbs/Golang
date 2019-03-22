@@ -19,7 +19,7 @@ type Route struct {
 type Meta struct {
 	Status     string `json:"status"`
 	Message    string `json:"message"`
-	ServerCode int `json:"server_code"`
+	ServerCode int    `json:"server_code"`
 }
 
 type Response struct {
@@ -84,8 +84,8 @@ var routes = Routes{
 	Route{
 		"GetSession",
 		"GET",
-		"/wr/v1/sessions/{id}",
-		GetDetailSession,
+		"/wr/v1/users/{id}/session",
+		GetSessionByUserId,
 	}, Route{
 		"InsertSession",
 		"POST",

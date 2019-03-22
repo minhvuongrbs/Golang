@@ -24,6 +24,11 @@ func RemoveSession(id string) error {
 	}
 }
 
+func UpdateSession(session models.Session) error {
+	err := ConnectDatabase().C(SessionCollection).UpdateId(session.SessionID,&session)
+	return err
+}
+
 func GetSessionById(id string) (models.Session, error) {
 	var session models.Session
 	if bson.IsObjectIdHex(id) {

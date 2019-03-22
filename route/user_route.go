@@ -28,7 +28,7 @@ func InsertUser(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
-	user, err := dao.InsertUser(userInfo)
+	_,user, err := dao.InsertUser(userInfo)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return

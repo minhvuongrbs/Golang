@@ -8,14 +8,6 @@ import (
 
 const UserCollection = "User"
 
-func GetAllVisitors() ([]models.User, error) {
-	var users []models.User
-	err := ConnectDatabase().C(UserCollection).Find(bson.M{"permission": 3}).All(&users)
-	if err != nil {
-		return users, err
-	}
-	return users, err
-}
 func FindUserById(id string) (models.User, error) {
 	var user models.User
 	err := ConnectDatabase().C(UserCollection).FindId(bson.ObjectIdHex(id)).One(&user)
@@ -33,7 +25,7 @@ func RemoveUser(id string) error {
 	return err
 }
 
-func InsertUser(userInfo models.UserInfo) (models.User, error) {
+func InsertUser(userInfo models.UserInfo) (bool, models.User, error) {
 	var user models.User
 	if userInfo.Language == "vi" {
 		user.FirstName, user.LastName = HandleNameInVi(userInfo.Name)
@@ -48,13 +40,15 @@ func InsertUser(userInfo models.UserInfo) (models.User, error) {
 	user.Data.HierarchyName = userInfo.HierarchyName
 	user.Permission = userInfo.Permission
 	if userInfo.UserID.Hex() == "" {
+		//insert user=> true
 		user.UserID = bson.NewObjectId()
 		err := ConnectDatabase().C(UserCollection).Insert(&user)
-		return user, err
+		return true, user, err
 	} else {
+		//update user=>false
 		user.UserID = userInfo.UserID
 		err := ConnectDatabase().C(UserCollection).UpdateId(user.UserID, &user)
-		return user, err
+		return false, user, err
 	}
 }
 
@@ -65,6 +59,8 @@ func HandleNameInVi(fullName string) (string, string) {
 		lastIndex := strings.LastIndex(fullName, " ")
 		firstName = fullName[0:index]
 		lastName = fullName[lastIndex+1 : (len(fullName))]
+	} else {
+		lastName = fullName
 	}
 	return firstName, lastName
 }
@@ -76,6 +72,8 @@ func HandleNameInEng(fullName string) (string, string) {
 		lastIndex := strings.LastIndex(fullName, " ")
 		lastName = fullName[0:index]
 		firstName = fullName[lastIndex+1 : (len(fullName))]
+	} else {
+		firstName = fullName
 	}
 	return firstName, lastName
 }
