@@ -61,7 +61,7 @@ func CheckDuplicationName(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	m["is_duplicate"] = true
-	respondWithJson(w, http.StatusInternalServerError, m)
+	respondWithJson(w, http.StatusOK, m)
 }
 
 func RemoveUser(w http.ResponseWriter, r *http.Request) {

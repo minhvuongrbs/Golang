@@ -52,13 +52,13 @@ var routes = Routes{
 		Index,
 	},
 	Route{
-		"Create User",
+		"Insert User",
 		"POST",
 		"/wr/v1/users",
 		InsertUser,
 	},
 	Route{
-		"Get User",
+		"Get User by ID",
 		"GET",
 		"/wr/v1/users/{id}",
 		GetUserById,
@@ -82,7 +82,7 @@ var routes = Routes{
 		GetAllSession,
 	},
 	Route{
-		"GetSession",
+		"GetSession By ID",
 		"GET",
 		"/wr/v1/users/{id}/session",
 		GetSessionByUserId,
@@ -99,7 +99,7 @@ var routes = Routes{
 		RemoveSessions,
 	},
 	Route{
-		"GetAllVideo",
+		"Get All Video",
 		"GET",
 		"/wr/v1/videos",
 		GetAllVideo,
@@ -111,13 +111,13 @@ var routes = Routes{
 		InsertVideo,
 	},
 	Route{
-		"Delte Video",
+		"Delete Video",
 		"DELETE",
 		"/wr/v1/videos/{id}",
 		DeleteVideo,
 	},
 	Route{
-		"Get Video Time",
+		"Get Video Time by ID",
 		"GET",
 		"/wr/v1/videotimes/{id}",
 		GetVideoTime,

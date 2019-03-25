@@ -105,8 +105,16 @@ func RemoveSessions(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusBadRequest, err.Error())
 		return
 	}
-	_ = dao.RemoveUser(session.UserID.Hex())
-	_ = dao.DeleteVideoTimeBySessionId(session.SessionID.Hex())
+	err = dao.RemoveUser(session.UserID.Hex())
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	err = dao.DeleteVideoTimeBySessionId(session.SessionID.Hex())
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
 	if err := dao.RemoveSession(params["id"]); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
