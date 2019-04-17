@@ -1,53 +1,33 @@
 package dao
 
 import (
-	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"log"
-	. "welcome_robot/models"
+	. "welcomerobot-api/models"
 )
 
-type VideoTimeDAO struct {
-	Server     string
-	Database   string
-	db         *mgo.Database
-	Collection string
-}
-
-var videoTimeDAO VideoTimeDAO
-
-func init() {
-	videoTimeDAO.Collection = "VideoTime"
-}
-
-func (m *VideoTimeDAO) Connect() {
-	session, err := mgo.Dial(m.Server)
-	if err != nil {
-		log.Fatal(err)
-	}
-	m.db = session.DB(m.Database)
-}
-
-func (m *VideoTimeDAO) FindById(id string) (VideoTime, error) {
+func GetVideoTimeById(id string) (VideoTime, error) {
 	var videoTime VideoTime
-	err := m.db.C(videoTimeDAO.Collection).Find(bson.ObjectIdHex(id)).One(&videoTime)
+	err := ConnectDatabase().C(VideoTimeCollection).FindId(bson.ObjectIdHex(id)).One(&videoTime)
 	return videoTime, err
 }
-func (m *VideoTimeDAO) FindAll() ([]VideoTime, error) {
+func GetAllVideoTimes() ([]VideoTime, error) {
 	var videoTimes []VideoTime
-	err := m.db.C(videoTimeDAO.Collection).Find(bson.M{}).All(&videoTimes)
+	err := ConnectDatabase().C(VideoTimeCollection).Find(bson.M{}).All(&videoTimes)
 	return videoTimes, err
 }
-func (m *VideoTimeDAO) Insert(videoTime VideoTime) error {
-	err := m.db.C(videoTimeDAO.Collection).Insert(&videoTime)
+func InsertVideoTime(videoTime VideoTime) error {
+	err := ConnectDatabase().C(VideoTimeCollection).Insert(&videoTime)
 	return err
 }
-func (m *VideoTimeDAO) Update(videoTime VideoTime) error {
-	err := m.db.C(videoTimeDAO.Collection).UpdateId(videoTime.VideoTimeID, &videoTime)
+func UpdateVideoTime(videoTime VideoTime) error {
+	err := ConnectDatabase().C(VideoTimeCollection).UpdateId(videoTime.VideoTimeID, &videoTime)
 	return err
 }
-func (m *VideoTimeDAO) Delete(id string) error{
-	err:=m.db.C(videoTimeDAO.Collection).RemoveId(bson.ObjectIdHex(id))
+func DeleteVideoTime(id string) error {
+	err := ConnectDatabase().C(VideoTimeCollection).RemoveId(bson.ObjectIdHex(id))
 	return err
 }
-
+func DeleteVideoTimeBySessionId(id string) error {
+	err := ConnectDatabase().C(VideoTimeCollection).Remove(bson.M{"session_id": bson.ObjectIdHex(id)})
+	return err
+}

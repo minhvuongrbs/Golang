@@ -1,7 +1,7 @@
 package models
 
 type Data struct {
-	Avatar      string    `bson:"avatar"`
-	HierarchyName string `bson:"hierarchy_name"`
-	Description string    `bson:"description"`
+	Avatar        string    `bson:"avatar" json:"avatar"`
+	HierarchyName string    `bson:"hierarchy_name" json:"hierarchy_name"`
+	Description   [2]string `bson:"description" json:"description"`
 }

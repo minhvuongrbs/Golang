@@ -6,8 +6,8 @@ import (
 )
 
 type Session struct {
-	SessionID bson.ObjectId `bson:"_id,omitempty"`
-	SupporterID bson.ObjectId `bson:"supporter_id,omitempty"`
-	UserID bson.ObjectId `bson:"user_id"`
-	CheckInTime time.Time `bson:"check_in_time,omitempty"`
+	SessionID   bson.ObjectId `bson:"_id,omitempty" json:"session_id"`
+	SupporterID bson.ObjectId `bson:"supporter_id,omitempty" json:"supporter_id"`
+	UserID      bson.ObjectId `bson:"user_id" json:"user_id"`
+	CheckInTime time.Time     `bson:"check_in_time,omitempty" json:"check_in_time"`
 }
